@@ -80,16 +80,6 @@
     invPanel.style.opacity   = String(clamp(invP / 0.25, 0, 1));
     invPanel.setAttribute('aria-hidden', invP > 0.05 ? 'false' : 'true');
 
-    // Start music when invitation is clearly visible
-    if (invP > 0.55 && !musicStarted) {
-      musicStarted = true;
-      musicToggle.hidden = false;
-      var attempt = song.play();
-      if (attempt && typeof attempt.catch === 'function') {
-        attempt.catch(function () { setPlayingUI(false); });
-      }
-    }
-
     // --- Scroll hint: fades out as soon as scrolling begins ---
     scrollHint.style.opacity = String(1 - clamp(progress / 0.08, 0, 1));
 
@@ -135,7 +125,25 @@
     }, 10000);
   }
 
+  // ---- Music: start on the very first user gesture ----
+  // Browsers block autoplay until the user interacts, so we kick the song off
+  // on the first scroll/tap/key — i.e. as soon as someone starts scrolling.
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    musicToggle.hidden = false;
+    var attempt = song.play();
+    if (attempt && typeof attempt.catch === 'function') {
+      attempt.catch(function () {
+        // Playback was blocked — let the user try again on the next gesture.
+        musicStarted = false;
+        setPlayingUI(false);
+      });
+    }
+  }
+
   function registerInteraction() {
+    startMusic();
     // Ignore scroll events produced by our own programmatic auto-scroll
     if (autoScrolling) return;
     scheduleAutoScroll();
