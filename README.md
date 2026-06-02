@@ -1,9 +1,15 @@
-# Wedding Invitation
+# Isidora & Nebojša — Wedding Invitation
 
-A single-page wedding invitation: a full-screen hero photo framed by a slim
-header and footer, with **“Felicità” by Al Bano & Romina Power** playing when a
-visitor taps to enter. A **Details & RSVP** panel holds the event info and
-links out to your RSVP form.
+A single-page wedding invitation for **Isidora & Nebojša** (04.10.2026), built
+to match the printed card: warm cream paper, gold botanical corners, the
+couple's photo centred in a soft frame, the calligraphy names, and the schedule
+and RSVP below. **“Felicità” by Al Bano & Romina Power** plays when a visitor
+taps to enter, and an RSVP button links out to a Google Form.
+
+Fonts: **Pinyon Script** for the names and **Cormorant Garamond** for
+everything else (both loaded from Google Fonts, with the Latin-Extended subset
+so Serbian diacritics like *š* render correctly). The gold corner ornaments
+live in `assets/corner.svg`.
 
 ## Run it
 
@@ -19,15 +25,13 @@ python3 -m http.server 8000
 
 | What | Where |
 | --- | --- |
-| Your photo | add `assets/hero.jpg` (see `assets/README.md`) |
+| The photo | `assets/hero.jpg` (already set to the couple's photo; replace to change) |
 | The song | add `assets/felicita.mp3` (see `assets/README.md`) |
-| Names | `index.html` — the `Isidora & Vlad` spots |
-| Date & place | `index.html` — `.footer-date` and `.footer-place` |
-| Event details | `index.html` — the `.details-grid` section (when / where / dress code / reply-by) |
+| Date | `index.html` — the `.date` line (`04.10.2026.`) |
+| Names | `index.html` — the `.names` and `.enter-names` headings |
+| Schedule | `index.html` — the three `.schedule` lines (14h / 16h / 16.30h) |
+| RSVP deadline | `index.html` — the `.rsvp-note` line |
 | RSVP form | `index.html` — the RSVP button's `href` (search `REPLACE_WITH_YOUR_FORM`) |
-
-> All names, dates, places, and details in `index.html` are placeholders —
-> edit them to your details.
 
 ## RSVP (Google Form)
 
@@ -44,9 +48,11 @@ a Google Sheet.
 ## How the music works
 
 Browsers block audio with sound from auto-playing on page load, so the page
-opens with a **“Tap to open the invitation”** screen. That tap is the user
-gesture browsers require, and it both reveals the photo and starts the song.
-A small button in the corner lets visitors pause or resume the music.
+opens with a **“Dodirnite da otvorite pozivnicu”** (tap to open) screen. That
+tap is the user gesture browsers require, and it both reveals the card and
+starts the song. A small button in the corner lets visitors pause or resume the
+music. Add the audio as `assets/felicita.mp3` — without it the page still opens,
+just silently.
 
 ## Hosting (free) — GitHub Pages project site
 

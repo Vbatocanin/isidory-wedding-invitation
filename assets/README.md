@@ -1,18 +1,21 @@
-# Assets — add your photo and the song here
+# Assets
 
-This folder holds the two files that make the invitation personal. Both are
-intentionally **not** committed to the repo (a photo is private, and the song
-is copyrighted), so you drop them in yourself.
+| File | What it is |
+| --- | --- |
+| `hero.jpg` | the couple's photo (cropped from the invitation you sent) |
+| `corner.svg` | the gold botanical corner ornament (used in all four corners) |
+| `hero-placeholder.svg` | fallback shown only if `hero.jpg` is missing |
+| `felicita.mp3` | **you add this** — the song (copyrighted, see below) |
 
-## 1. The hero photo → `hero.jpg`
+## The hero photo → `hero.jpg`
 
-Place your photo here and name it exactly `hero.jpg`.
+This is already set to the couple's photo. To change it, replace `hero.jpg`
+with another image of the same name.
 
-- Any web image format works if you keep the `.jpg` name, but a real JPEG/PNG
-  is best. A **portrait** orientation around **1000 × 1400 px** or larger looks
-  great, since the photo fills the whole page.
-- Until you add it, a gold-framed placeholder (`hero-placeholder.svg`) is shown
-  automatically — nothing breaks.
+- A **portrait** orientation (taller than wide) looks best in the frame; the
+  page applies a black-and-white filter automatically to match the card.
+- If the file is ever missing, the gold-framed `hero-placeholder.svg` shows
+  instead — nothing breaks.
 
 ## 2. The song → `felicita.mp3`
 

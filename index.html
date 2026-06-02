@@ -1,16 +1,16 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Wedding Invitation</title>
-  <meta name="description" content="You are warmly invited to our wedding." />
+  <title>Isidora &amp; Nebojša — Pozivnica</title>
+  <meta name="description" content="Pozivnica na venčanje — Isidora i Nebojša, 04.10.2026." />
 
-  <!-- Elegant serif + script pairing -->
+  <!-- Script for the names + serif for everything else (latin-ext for š, č, ž…) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Great+Vibes&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap"
     rel="stylesheet"
   />
 
@@ -24,100 +24,62 @@
     1. PHOTO  → replace assets/hero.jpg with your own photo.
     2. SONG   → drop the "Felicità" mp3 in at assets/felicita.mp3
                 (see assets/README.md for details).
-    3. TEXT   → edit the names / date / location below.
-    4. RSVP   → in the "Details & RSVP" panel below, set the RSVP
-                button's href to your Google Form share link
+    3. TEXT   → edit the date / names / schedule / RSVP below.
+    4. RSVP   → set the RSVP button's href to your Google Form link
                 (search for: REPLACE_WITH_YOUR_FORM).
     ============================================================
   -->
 
+  <!-- Gold botanical corners (decorative) -->
+  <div class="corner corner-tl" aria-hidden="true"></div>
+  <div class="corner corner-tr" aria-hidden="true"></div>
+  <div class="corner corner-bl" aria-hidden="true"></div>
+  <div class="corner corner-br" aria-hidden="true"></div>
+
   <!-- Entry overlay: a tap is required so the song is allowed to play -->
   <div id="enter-screen" class="enter-screen">
     <div class="enter-inner">
-      <p class="enter-kicker">You are invited</p>
-      <h1 class="enter-names">Isidora &amp; Vlad</h1>
-      <p class="enter-hint">Tap to open the invitation</p>
-      <span class="enter-note">♪ with music</span>
+      <p class="enter-kicker">Pozvani ste</p>
+      <h1 class="enter-names">Isidora &amp; Nebojša</h1>
+      <p class="enter-hint">Dodirnite da otvorite pozivnicu</p>
+      <span class="enter-note">♪ uz muziku</span>
     </div>
   </div>
 
-  <!-- The page itself: a full-bleed hero photo -->
+  <!-- The invitation card -->
   <main id="invitation" class="invitation" aria-hidden="true">
-    <header class="page-header">
-      <span class="header-names">Isidora &amp; Vlad</span>
-    </header>
+    <p class="date">04.10.2026.</p>
 
-    <!-- The photo IS the page. Swap assets/hero.jpg for your own. -->
-    <figure class="hero">
+    <h1 class="names">Isidora &amp; Nebojša</h1>
+
+    <figure class="photo">
       <img
         src="assets/hero.jpg"
-        alt="The happy couple"
-        class="hero-img"
+        alt="Isidora i Nebojša"
+        class="photo-img"
         onerror="this.onerror=null;this.src='assets/hero-placeholder.svg';"
       />
     </figure>
 
-    <footer class="page-footer">
-      <span class="footer-date">Saturday, the 12th of September 2026</span>
-      <span class="footer-sep">·</span>
-      <span class="footer-place">Belgrade, Serbia</span>
-      <button id="details-open" class="details-link" type="button">Details &amp; RSVP</button>
-    </footer>
+    <section class="schedule">
+      <p><span class="time">14h</span> Crkveno venčanje u Crkvi Svete Trojice, Ripanj</p>
+      <p><span class="time">16h</span> Okupljanje gostiju, Restoran Easy, Beograd</p>
+      <p><span class="time">16.30h</span> Venčanje</p>
+    </section>
+
+    <p class="rsvp-note">
+      Molimo vas da svoj dolazak potvrdite do 20. septembra 2026. godine.
+    </p>
+
+    <!-- RSVP → replace the href with your Google Form share link -->
+    <a id="rsvp-button"
+       class="rsvp-button"
+       href="https://forms.gle/REPLACE_WITH_YOUR_FORM"
+       target="_blank" rel="noopener">Potvrdite dolazak</a>
   </main>
 
-  <!--
-    Details & RSVP panel.
-    EDIT the details below to your event. The RSVP button points at your
-    Google Form — set its URL in the data-rsvp-url attribute (and href).
-  -->
-  <div id="details" class="details-overlay" hidden>
-    <div class="details-panel" role="dialog" aria-modal="true" aria-labelledby="details-title">
-      <button id="details-close" class="details-close" type="button" aria-label="Close">&times;</button>
-
-      <p class="details-kicker">Together with their families</p>
-      <h2 id="details-title" class="details-names">Isidora &amp; Vlad</h2>
-      <p class="details-sub">request the pleasure of your company</p>
-
-      <div class="details-grid">
-        <section class="detail">
-          <h3>When</h3>
-          <p>Saturday, 12 September 2026</p>
-          <p>Ceremony at 4:00 pm · Reception to follow</p>
-        </section>
-
-        <section class="detail">
-          <h3>Where</h3>
-          <p>Venue Name</p>
-          <p>Street Address, Belgrade, Serbia</p>
-          <p>
-            <a class="detail-map"
-               href="https://maps.google.com/?q=Belgrade+Serbia"
-               target="_blank" rel="noopener">View map &rsaquo;</a>
-          </p>
-        </section>
-
-        <section class="detail">
-          <h3>Dress code</h3>
-          <p>Formal / black tie optional</p>
-        </section>
-
-        <section class="detail">
-          <h3>Kindly reply by</h3>
-          <p>1 August 2026</p>
-        </section>
-      </div>
-
-      <!-- RSVP → replace the href with your Google Form's share link -->
-      <a id="rsvp-button"
-         class="rsvp-button"
-         href="https://forms.gle/REPLACE_WITH_YOUR_FORM"
-         target="_blank" rel="noopener">RSVP</a>
-      <p class="rsvp-hint">Opens our RSVP form in a new tab</p>
-    </div>
-  </div>
-
   <!-- Floating music toggle (appears after entering) -->
-  <button id="music-toggle" class="music-toggle" aria-label="Pause music" hidden>
+  <button id="music-toggle" class="music-toggle" aria-label="Pauziraj muziku" hidden>
     <span class="music-icon" aria-hidden="true"></span>
   </button>
 
