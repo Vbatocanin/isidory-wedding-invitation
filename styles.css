@@ -1,141 +1,152 @@
 /* ============================================================
    Wedding invitation — Isidora & Nebojša
-   Card style: cream paper, gold botanicals, centred photo
    ============================================================ */
 
 :root {
-  --ink: #3a342c;
-  --gold: #b08d50;
+  --ink:       #3a342c;
+  --gold:      #b08d50;
   --gold-soft: #c8ab78;
-  /* warm cream paper, lighter at top, warmer toward the bottom */
-  --paper-top: #f4f0e8;
-  --paper-bot: #e7dac6;
-  --corner: clamp(120px, 26vw, 230px);
+  --cream:     #fdfbf7;
 }
 
-* {
-  box-sizing: border-box;
+* { box-sizing: border-box; }
+
+html {
+  margin: 0;
+  padding: 0;
 }
 
-html,
 body {
   margin: 0;
   padding: 0;
-  min-height: 100%;
-}
-
-body {
-  min-height: 100vh;
+  /* 220vh gives ~1.2 screen-heights of scroll room; all visuals are position:fixed */
+  height: 220vh;
   color: var(--ink);
-  background:
-    radial-gradient(120% 90% at 50% 0%, var(--paper-top), transparent 70%),
-    linear-gradient(180deg, var(--paper-top) 0%, #efe7da 55%, var(--paper-bot) 100%);
-  background-attachment: fixed;
   font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
 }
 
-/* ---------- Gold botanical corners ---------- */
-.corner {
-  position: fixed;
-  width: var(--corner);
-  height: var(--corner);
-  background: url("assets/corner.svg") no-repeat;
-  background-size: contain;
-  pointer-events: none;
-  z-index: 1;
-  opacity: 0.9;
-}
-.corner-tl { top: 0; left: 0; }
-.corner-tr { top: 0; right: 0; transform: scaleX(-1); }
-.corner-bl { bottom: 0; left: 0; transform: scaleY(-1); }
-.corner-br { bottom: 0; right: 0; transform: scale(-1, -1); }
-
-/* ---------- Entry overlay ---------- */
-.enter-screen {
+/* ---------- Gallery screen ---------- */
+#gallery-screen {
   position: fixed;
   inset: 0;
-  z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  cursor: pointer;
-  background:
-    radial-gradient(circle at 50% 38%, rgba(176, 141, 80, 0.12), transparent 62%),
-    linear-gradient(180deg, var(--paper-top), var(--paper-bot));
-  transition: opacity 1.1s ease, visibility 1.1s ease;
-}
-.enter-screen.hidden {
-  opacity: 0;
-  visibility: hidden;
-}
-.enter-inner {
-  padding: 2rem;
-  animation: rise 1.2s ease both;
-}
-.enter-kicker {
-  margin: 0;
-  text-transform: uppercase;
-  letter-spacing: 0.42em;
-  font-size: clamp(0.7rem, 2.4vw, 0.95rem);
-  color: var(--gold);
-}
-.enter-names {
-  font-family: "Pinyon Script", "Great Vibes", cursive;
-  font-weight: 400;
-  margin: 0.5rem 0 0.7rem;
-  font-size: clamp(3rem, 12vw, 6rem);
-  line-height: 1.05;
-  color: var(--gold);
-}
-.enter-hint {
-  margin: 0.4rem 0 0;
-  font-size: clamp(1rem, 3.4vw, 1.3rem);
-  letter-spacing: 0.06em;
-  opacity: 0.85;
-}
-.enter-note {
-  display: inline-block;
-  margin-top: 1.6rem;
-  font-size: 0.85rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: var(--gold);
-  animation: pulse 2.4s ease-in-out infinite;
+  z-index: 10;
+  background: var(--cream);
+  overflow: hidden;
+  animation: gallery-fade-in 1s ease both;
 }
 
-/* ---------- The invitation card ---------- */
-.invitation {
-  position: relative;
-  z-index: 2;
-  max-width: 600px;
-  margin: 0 auto;
-  padding: clamp(2.5rem, 8vw, 4.5rem) clamp(1.4rem, 6vw, 3rem) clamp(2rem, 6vw, 3.5rem);
-  text-align: center;
-  min-height: 100vh;
+/* ---------- Photo items ---------- */
+.photo-item {
+  position: absolute;
+  will-change: transform, opacity;
+  transform-origin: center center;
+}
+
+.photo-item img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 4px;
+  box-shadow:
+    0 6px 24px rgba(58, 52, 44, 0.22),
+    0 1px 5px  rgba(58, 52, 44, 0.12);
+}
+
+/* Loose 2×2 grid — varied sizes, orthogonal; z-index = depth order */
+#photo-0 { top: 13%;  left: 16%;  width: 26%; height: 27%; z-index: 1; }
+#photo-1 { top: 7%;   right: 9%;  width: 40%; height: 39%; z-index: 2; }
+#photo-2 { bottom: 16%; left: 8%; width: 38%; height: 37%; z-index: 3; }
+#photo-3 { bottom: 13%; right: 16%; width: 28%; height: 29%; z-index: 4; }
+
+/* ---------- Scroll hint ---------- */
+#scroll-hint {
+  position: absolute;
+  bottom: 3.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.4rem 0.8rem;
+  border: none;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 0.2s ease;
+  will-change: opacity;
+}
+#scroll-hint:hover { transform: translateX(-50%) translateY(-3px); }
+
+.scroll-hint-text {
+  display: block;
+  font-size: clamp(0.95rem, 3vw, 1.15rem);
+  letter-spacing: 0.14em;
+  color: var(--ink);
+  opacity: 0.95;
+  /* legible over photos without a backing pill */
+  text-shadow:
+    0 1px 6px rgba(253, 251, 247, 0.98),
+    0 0  14px rgba(253, 251, 247, 0.9),
+    0 0  22px rgba(253, 251, 247, 0.8);
+}
+
+.scroll-chevron-wrap {
+  animation: chevron-bounce 1.7s ease-in-out infinite;
+}
+
+.scroll-chevron {
+  width: 28px;
+  height: 17px;
+  color: var(--gold);
+  filter: drop-shadow(0 1px 5px rgba(253, 251, 247, 0.9));
+}
+
+/* ---------- Invitation panel ---------- */
+#invitation-panel {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  background: url("assets/floral_background.png") center center / cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.8rem, 2vw, 1.2rem);
-  opacity: 0;
-  transition: opacity 1.3s ease 0.2s;
+  transform-origin: center center;
+  will-change: transform, opacity;
+  /* initial state set by JS on load */
 }
-.invitation.revealed {
-  opacity: 1;
+
+#invitation {
+  max-width: 600px;
+  width: 100%;
+  padding:
+    clamp(0.8rem, 3.5vh, 4rem)
+    clamp(1.4rem, 6vw,  3rem)
+    clamp(0.8rem, 3.5vh, 3.5rem);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(0.3rem, 1.5vh, 1.2rem);
 }
 
 .date {
   margin: 0;
   font-size: clamp(1.3rem, 5vw, 1.9rem);
   letter-spacing: 0.32em;
-  text-indent: 0.32em; /* balance trailing letter-spacing */
+  text-indent: 0.32em;
   color: var(--ink);
 }
 
 .names {
-  font-family: "Pinyon Script", "Great Vibes", cursive;
+  font-family: "Apple Chancery", "Palatino Linotype", Palatino, "Book Antiqua", serif;
   font-weight: 400;
   margin: 0;
   font-size: clamp(3.4rem, 15vw, 6.5rem);
@@ -143,29 +154,12 @@ body {
   color: var(--gold);
 }
 
-/* Photo — centred, soft white "torn paper" frame */
-.photo {
-  margin: clamp(0.4rem, 2vw, 1rem) 0;
-  background: #fdfbf7;
-  padding: clamp(8px, 1.8vw, 14px);
-  box-shadow: 0 10px 30px rgba(58, 52, 44, 0.18);
-  max-width: min(80%, 420px);
-}
-.photo-img {
-  display: block;
-  width: 100%;
-  height: auto;
-  filter: grayscale(100%) contrast(1.02);
-}
-
 .schedule {
   margin-top: 0.4rem;
   font-size: clamp(1rem, 4vw, 1.3rem);
   line-height: 1.7;
 }
-.schedule p {
-  margin: 0.15rem 0;
-}
+.schedule p { margin: 0.15rem 0; }
 .schedule .time {
   color: var(--gold);
   font-weight: 600;
@@ -186,6 +180,7 @@ body {
   text-decoration: none;
   background: var(--gold);
   color: #fdfbf7;
+  font-family: "Cormorant Garamond", Georgia, serif;
   font-size: clamp(0.9rem, 3vw, 1.05rem);
   letter-spacing: 0.18em;
   text-transform: uppercase;
@@ -202,10 +197,10 @@ body {
 
 /* ---------- Music toggle ---------- */
 .music-toggle {
-  position: fixed;
+  position: absolute;
   right: clamp(14px, 3vw, 28px);
   bottom: clamp(16px, 3vh, 28px);
-  z-index: 20;
+  z-index: 30;
   width: 46px;
   height: 46px;
   border-radius: 50%;
@@ -218,9 +213,8 @@ body {
   transition: transform 0.2s ease;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
-.music-toggle:hover {
-  transform: scale(1.08);
-}
+.music-toggle:hover { transform: scale(1.08); }
+
 .music-icon,
 .music-icon::before,
 .music-icon::after {
@@ -241,28 +235,39 @@ body {
   transform: translateY(-50%);
 }
 .music-icon::before { left: -6px; height: 10px; }
-.music-icon::after  { left: 6px;  height: 10px; }
+.music-icon::after  { left:  6px; height: 10px; }
 
-.music-toggle.playing .music-icon          { animation: bar 0.9s ease-in-out infinite; }
-.music-toggle.playing .music-icon::before  { animation: bar 0.9s ease-in-out infinite 0.2s; }
-.music-toggle.playing .music-icon::after   { animation: bar 0.9s ease-in-out infinite 0.4s; }
+.music-toggle.playing .music-icon         { animation: bar 0.9s ease-in-out infinite; }
+.music-toggle.playing .music-icon::before { animation: bar 0.9s ease-in-out infinite 0.2s; }
+.music-toggle.playing .music-icon::after  { animation: bar 0.9s ease-in-out infinite 0.4s; }
 
 .music-toggle.paused .music-icon,
 .music-toggle.paused .music-icon::before,
 .music-toggle.paused .music-icon::after { height: 4px; }
 
-/* ---------- Animations ---------- */
-@keyframes rise {
-  from { opacity: 0; transform: translateY(14px); }
-  to   { opacity: 1; transform: translateY(0); }
+/* ---------- Keyframes ---------- */
+@keyframes gallery-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
-@keyframes pulse {
-  0%, 100% { opacity: 0.45; }
-  50% { opacity: 1; }
+
+@keyframes chevron-bounce {
+  0%, 100% { transform: translateY(0);   opacity: 0.7; }
+  45%, 55%  { transform: translateY(8px); opacity: 1;   }
 }
+
 @keyframes bar {
   0%, 100% { height: 16px; }
-  50% { height: 6px; }
+  50%       { height: 6px;  }
+}
+
+/* ---------- Short viewports ---------- */
+@media (max-height: 700px) {
+  .date        { font-size: 1.1rem; }
+  .names       { font-size: clamp(2.4rem, 10vw, 4rem); }
+  .schedule    { font-size: 0.9rem; }
+  .rsvp-note   { font-size: 0.85rem; }
+  .rsvp-button { font-size: 0.8rem; padding: 0.55em 1.8em; }
 }
 
 @media (prefers-reduced-motion: reduce) {

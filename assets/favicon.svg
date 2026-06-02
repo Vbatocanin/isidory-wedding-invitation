@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <circle cx="16" cy="16" r="15" fill="#f4f0e8" stroke="#b08d50" stroke-width="1.2"/>
+  <text x="16" y="21"
+    font-family="Palatino, 'Book Antiqua', Georgia, serif"
+    font-size="13"
+    font-style="italic"
+    font-weight="400"
+    fill="#b08d50"
+    text-anchor="middle">IN</text>
+</svg>

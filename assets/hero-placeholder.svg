@@ -12,7 +12,7 @@
   </g>
   <g fill="#b59b6e" text-anchor="middle">
     <text x="500" y="640" font-family="Georgia, serif" font-size="46" letter-spacing="4">YOUR PHOTO HERE</text>
-    <text x="500" y="710" font-family="Georgia, serif" font-size="26" opacity="0.8">replace assets/hero.jpg</text>
+    <text x="500" y="710" font-family="Georgia, serif" font-size="26" opacity="0.8">replace assets/hero.png</text>
   </g>
   <g fill="#b59b6e" opacity="0.85">
     <circle cx="500" cy="520" r="6"/>

@@ -25,7 +25,7 @@ python3 -m http.server 8000
 
 | What | Where |
 | --- | --- |
-| The photo | `assets/hero.jpg` (already set to the couple's photo; replace to change) |
+| The photo | `assets/hero.png` (already set to the couple's photo; replace to change) |
 | The song | add `assets/felicita.mp3` (see `assets/README.md`) |
 | Date | `index.html` — the `.date` line (`04.10.2026.`) |
 | Names | `index.html` — the `.names` and `.enter-names` headings |

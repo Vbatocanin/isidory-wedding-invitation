@@ -2,14 +2,14 @@
 
 | File | What it is |
 | --- | --- |
-| `hero.jpg` | the couple's photo (cropped from the invitation you sent) |
+| `hero.png` | the couple's photo (cropped from the invitation you sent) |
 | `corner.svg` | the gold botanical corner ornament (used in all four corners) |
-| `hero-placeholder.svg` | fallback shown only if `hero.jpg` is missing |
+| `hero-placeholder.svg` | fallback shown only if `hero.png` is missing |
 | `felicita.mp3` | **you add this** — the song (copyrighted, see below) |
 
-## The hero photo → `hero.jpg`
+## The hero photo → `hero.png`
 
-This is already set to the couple's photo. To change it, replace `hero.jpg`
+This is already set to the couple's photo. To change it, replace `hero.png`
 with another image of the same name.
 
 - A **portrait** orientation (taller than wide) looks best in the frame; the

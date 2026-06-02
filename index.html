@@ -6,86 +6,67 @@
   <title>Isidora &amp; Nebojša — Pozivnica</title>
   <meta name="description" content="Pozivnica na venčanje — Isidora i Nebojša, 04.10.2026." />
 
-  <!-- Script for the names + serif for everything else (latin-ext for š, č, ž…) -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Pinyon+Script&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&display=swap"
     rel="stylesheet"
   />
 
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <!--
-    ============================================================
-    HOW TO CUSTOMISE
-    ============================================================
-    1. PHOTO  → replace assets/hero.jpg with your own photo.
-    2. SONG   → drop the "Felicità" mp3 in at assets/felicita.mp3
-                (see assets/README.md for details).
-    3. TEXT   → edit the date / names / schedule / RSVP below.
-    4. RSVP   → set the RSVP button's href to your Google Form link
-                (search for: REPLACE_WITH_YOUR_FORM).
-    ============================================================
-  -->
 
-  <!-- Gold botanical corners (decorative) -->
-  <div class="corner corner-tl" aria-hidden="true"></div>
-  <div class="corner corner-tr" aria-hidden="true"></div>
-  <div class="corner corner-bl" aria-hidden="true"></div>
-  <div class="corner corner-br" aria-hidden="true"></div>
-
-  <!-- Entry overlay: a tap is required so the song is allowed to play -->
-  <div id="enter-screen" class="enter-screen">
-    <div class="enter-inner">
-      <p class="enter-kicker">Pozvani ste</p>
-      <h1 class="enter-names">Isidora &amp; Nebojša</h1>
-      <p class="enter-hint">Dodirnite da otvorite pozivnicu</p>
-      <span class="enter-note">♪ uz muziku</span>
+  <!-- Photo gallery — first screen; all visuals are position:fixed, body height provides scroll room -->
+  <div id="gallery-screen">
+    <div class="photo-item" id="photo-0">
+      <img src="assets/images/IMG_4071.png" alt="" />
     </div>
+    <div class="photo-item" id="photo-1">
+      <img src="assets/images/IMG_3936 2.png" alt="" />
+    </div>
+    <div class="photo-item" id="photo-2">
+      <img src="assets/images/0ac86ce3-7c8e-48cb-ba48-e50557eb331c 2.png" alt="" />
+    </div>
+    <div class="photo-item" id="photo-3">
+      <img src="assets/images/6218f7a4-5ffc-48e7-8cbd-07a503e00d68 2.png" alt="" />
+    </div>
+
+    <button id="scroll-hint" type="button" aria-label="Skrolujte nadole">
+      <span class="scroll-hint-text">Skrolujte nadole</span>
+      <div class="scroll-chevron-wrap">
+        <svg class="scroll-chevron" viewBox="0 0 24 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M1 1L12 12L23 1" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </button>
   </div>
 
-  <!-- The invitation card -->
-  <main id="invitation" class="invitation" aria-hidden="true">
-    <p class="date">04.10.2026.</p>
+  <!-- Invitation panel — zooms in from the centre as user scrolls -->
+  <div id="invitation-panel" aria-hidden="true">
+    <main id="invitation">
+      <p class="date">04.10.2026.</p>
+      <h1 class="names">Isidora &amp; Nebojša</h1>
+      <section class="schedule">
+        <p><span class="time">14h</span> Crkveno venčanje u Crkvi Svete Trojice, Ripanj</p>
+        <p><span class="time">16h</span> Okupljanje gostiju, Restoran Easy, Beograd</p>
+        <p><span class="time">16.30h</span> Venčanje</p>
+      </section>
+      <p class="rsvp-note">
+        Molimo vas da svoj dolazak potvrdite do 20. septembra 2026. godine.
+      </p>
+      <a id="rsvp-button" class="rsvp-button"
+         href="https://forms.gle/rJuRy1pQHEXEaRydA"
+         target="_blank" rel="noopener">Potvrdite dolazak</a>
+    </main>
 
-    <h1 class="names">Isidora &amp; Nebojša</h1>
+    <button id="music-toggle" class="music-toggle" aria-label="Pusti muziku" hidden>
+      <span class="music-icon" aria-hidden="true"></span>
+    </button>
+  </div>
 
-    <figure class="photo">
-      <img
-        src="assets/hero.jpg"
-        alt="Isidora i Nebojša"
-        class="photo-img"
-        onerror="this.onerror=null;this.src='assets/hero-placeholder.svg';"
-      />
-    </figure>
-
-    <section class="schedule">
-      <p><span class="time">14h</span> Crkveno venčanje u Crkvi Svete Trojice, Ripanj</p>
-      <p><span class="time">16h</span> Okupljanje gostiju, Restoran Easy, Beograd</p>
-      <p><span class="time">16.30h</span> Venčanje</p>
-    </section>
-
-    <p class="rsvp-note">
-      Molimo vas da svoj dolazak potvrdite do 20. septembra 2026. godine.
-    </p>
-
-    <!-- RSVP → replace the href with your Google Form share link -->
-    <a id="rsvp-button"
-       class="rsvp-button"
-       href="https://forms.gle/REPLACE_WITH_YOUR_FORM"
-       target="_blank" rel="noopener">Potvrdite dolazak</a>
-  </main>
-
-  <!-- Floating music toggle (appears after entering) -->
-  <button id="music-toggle" class="music-toggle" aria-label="Pauziraj muziku" hidden>
-    <span class="music-icon" aria-hidden="true"></span>
-  </button>
-
-  <!-- The song. Add assets/felicita.mp3 — see assets/README.md -->
   <audio id="song" src="assets/felicita.mp3" loop preload="auto"></audio>
-
   <script src="script.js"></script>
 </body>
 </html>
