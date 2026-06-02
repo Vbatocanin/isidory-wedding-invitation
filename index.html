@@ -25,6 +25,9 @@
     2. SONG   → drop the "Felicità" mp3 in at assets/felicita.mp3
                 (see assets/README.md for details).
     3. TEXT   → edit the names / date / location below.
+    4. RSVP   → in the "Details & RSVP" panel below, set the RSVP
+                button's href to your Google Form share link
+                (search for: REPLACE_WITH_YOUR_FORM).
     ============================================================
   -->
 
@@ -58,8 +61,60 @@
       <span class="footer-date">Saturday, the 12th of September 2026</span>
       <span class="footer-sep">·</span>
       <span class="footer-place">Belgrade, Serbia</span>
+      <button id="details-open" class="details-link" type="button">Details &amp; RSVP</button>
     </footer>
   </main>
+
+  <!--
+    Details & RSVP panel.
+    EDIT the details below to your event. The RSVP button points at your
+    Google Form — set its URL in the data-rsvp-url attribute (and href).
+  -->
+  <div id="details" class="details-overlay" hidden>
+    <div class="details-panel" role="dialog" aria-modal="true" aria-labelledby="details-title">
+      <button id="details-close" class="details-close" type="button" aria-label="Close">&times;</button>
+
+      <p class="details-kicker">Together with their families</p>
+      <h2 id="details-title" class="details-names">Isidora &amp; Vlad</h2>
+      <p class="details-sub">request the pleasure of your company</p>
+
+      <div class="details-grid">
+        <section class="detail">
+          <h3>When</h3>
+          <p>Saturday, 12 September 2026</p>
+          <p>Ceremony at 4:00 pm · Reception to follow</p>
+        </section>
+
+        <section class="detail">
+          <h3>Where</h3>
+          <p>Venue Name</p>
+          <p>Street Address, Belgrade, Serbia</p>
+          <p>
+            <a class="detail-map"
+               href="https://maps.google.com/?q=Belgrade+Serbia"
+               target="_blank" rel="noopener">View map &rsaquo;</a>
+          </p>
+        </section>
+
+        <section class="detail">
+          <h3>Dress code</h3>
+          <p>Formal / black tie optional</p>
+        </section>
+
+        <section class="detail">
+          <h3>Kindly reply by</h3>
+          <p>1 August 2026</p>
+        </section>
+      </div>
+
+      <!-- RSVP → replace the href with your Google Form's share link -->
+      <a id="rsvp-button"
+         class="rsvp-button"
+         href="https://forms.gle/REPLACE_WITH_YOUR_FORM"
+         target="_blank" rel="noopener">RSVP</a>
+      <p class="rsvp-hint">Opens our RSVP form in a new tab</p>
+    </div>
+  </div>
 
   <!-- Floating music toggle (appears after entering) -->
   <button id="music-toggle" class="music-toggle" aria-label="Pause music" hidden>

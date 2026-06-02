@@ -68,4 +68,35 @@
   // Keep the icon in sync with actual playback state.
   song.addEventListener("play", function () { setPlayingUI(true); });
   song.addEventListener("pause", function () { setPlayingUI(false); });
+
+  // ---------- Details & RSVP panel ----------
+  var detailsOverlay = document.getElementById("details");
+  var detailsOpen = document.getElementById("details-open");
+  var detailsClose = document.getElementById("details-close");
+
+  function openDetails() {
+    detailsOverlay.hidden = false;
+    // next frame so the CSS transition runs
+    requestAnimationFrame(function () {
+      detailsOverlay.classList.add("open");
+    });
+  }
+
+  function closeDetails() {
+    detailsOverlay.classList.remove("open");
+    window.setTimeout(function () {
+      detailsOverlay.hidden = true;
+    }, 350);
+  }
+
+  detailsOpen.addEventListener("click", openDetails);
+  detailsClose.addEventListener("click", closeDetails);
+
+  // Close on backdrop click or Escape.
+  detailsOverlay.addEventListener("click", function (e) {
+    if (e.target === detailsOverlay) closeDetails();
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape" && !detailsOverlay.hidden) closeDetails();
+  });
 })();
