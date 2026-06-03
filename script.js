@@ -2,6 +2,7 @@
 (function () {
   'use strict';
 
+  var scroller      = document.getElementById('scroller');
   var galleryScreen = document.getElementById('gallery-screen');
   var invPanel      = document.getElementById('invitation-panel');
   var scrollHint    = document.getElementById('scroll-hint');
@@ -31,7 +32,11 @@
   }
 
   function computeScrollRange() {
-    SCROLL_RANGE = document.body.scrollHeight - window.innerHeight;
+    SCROLL_RANGE = scroller.scrollHeight - scroller.clientHeight;
+  }
+
+  function getScrollY() {
+    return scroller.scrollTop;
   }
 
   // ---- Initial state ----
@@ -46,7 +51,7 @@
 
   // ---- Main render ----
   function render() {
-    var scrollY = window.scrollY || window.pageYOffset;
+    var scrollY = getScrollY();
 
     if (scrollY === lastScrollY) return;
     lastScrollY = scrollY;
@@ -95,14 +100,14 @@
 
   // ---- Auto-scroll: kicks in after 10 s of no user interaction ----
   function smoothScrollTo(target, duration, done) {
-    var startY = window.scrollY || window.pageYOffset;
+    var startY = getScrollY();
     var diff   = target - startY;
     var startT = null;
 
     function step(ts) {
       if (!startT) startT = ts;
       var t = clamp((ts - startT) / duration, 0, 1);
-      window.scrollTo(0, startY + diff * easeInOutCubic(t));
+      scroller.scrollTop = startY + diff * easeInOutCubic(t);
       if (t < 1) {
         requestAnimationFrame(step);
       } else if (typeof done === 'function') {
@@ -117,7 +122,7 @@
   function scheduleAutoScroll() {
     clearTimeout(autoTimer);
     autoTimer = setTimeout(function () {
-      var atTop = (window.scrollY || window.pageYOffset) < SCROLL_RANGE * 0.05;
+      var atTop = getScrollY() < SCROLL_RANGE * 0.05;
       if (!autoScrolling && atTop) {
         autoScrolling = true;
         smoothScrollTo(SCROLL_RANGE, 3500, function () { autoScrolling = false; });
@@ -156,10 +161,11 @@
     smoothScrollTo(SCROLL_RANGE, 1800, function () { autoScrolling = false; });
   });
 
-  var interactionEvents = ['touchstart', 'mousedown', 'keydown', 'wheel'];
-  interactionEvents.forEach(function (evt) {
-    window.addEventListener(evt, registerInteraction, { passive: true });
+  // Scroll/pointer gestures happen on the scroller; keydown stays on window.
+  ['touchstart', 'mousedown', 'wheel'].forEach(function (evt) {
+    scroller.addEventListener(evt, registerInteraction, { passive: true });
   });
+  window.addEventListener('keydown', registerInteraction, { passive: true });
 
   // ---- Music toggle ----
   function setPlayingUI(isPlaying) {

@@ -18,7 +18,12 @@
 </head>
 <body>
 
-  <!-- Photo gallery — first screen; all visuals are position:fixed, body height provides scroll room -->
+  <!-- Scroll happens inside this container (not the document) so Android's
+       pull-to-refresh / rubber-band overscroll never triggers. The visuals are
+       position:fixed; #scroll-spacer provides the scroll distance. -->
+  <div id="scroller">
+
+  <!-- Photo gallery — first screen; all visuals are position:fixed, the spacer provides scroll room -->
   <div id="gallery-screen">
     <div class="photo-item" id="photo-0">
       <img src="assets/images/IMG_4071.png" alt="" />
@@ -65,6 +70,11 @@
       <span class="music-icon" aria-hidden="true"></span>
     </button>
   </div>
+
+  <!-- Invisible block that gives the scroller its scroll length -->
+  <div id="scroll-spacer" aria-hidden="true"></div>
+
+  </div><!-- /#scroller -->
 
   <audio id="song" src="assets/felicita.mp3" loop preload="auto"></audio>
   <script src="script.js"></script>

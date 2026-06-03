@@ -16,23 +16,44 @@ html {
   padding: 0;
   /* Cream backdrop so any momentary boundary gap matches the gallery, not white */
   background: var(--cream);
-  /* Kill rubber-band bounce, pull-to-refresh and scroll-chaining on mobile.
-     Without this the position:fixed visuals appear to jump at the top/bottom. */
+}
+
+/* The document itself never scrolls — scrolling lives inside #scroller. This is
+   what makes overscroll rock-solid on mobile: Android's pull-to-refresh and the
+   rubber-band bounce are tied to the *root* scroller, so moving the scroll into a
+   nested element disables them outright. */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
   overscroll-behavior: none;
 }
 
 body {
   margin: 0;
   padding: 0;
-  /* 220vh gives ~1.2 screen-heights of scroll room; all visuals are position:fixed */
-  height: 220vh;
   color: var(--ink);
   font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* ---------- Scroll container ---------- */
+#scroller {
+  position: fixed;
+  inset: 0;
+  overflow-y: scroll;
   overflow-x: hidden;
-  /* Steady the scroll: no overscroll bounce, vertical-only gestures */
+  /* Belt-and-suspenders: kill any bounce/glow within the container too */
   overscroll-behavior: none;
   touch-action: pan-y;
+}
+
+/* Invisible spacer — its height (220vh = ~1.2 extra screens) is the scroll room.
+   The gallery and invitation are position:fixed, so they sit on top of it. */
+#scroll-spacer {
+  width: 1px;
+  height: 220vh;
+  pointer-events: none;
 }
 
 /* ---------- Gallery screen ---------- */
