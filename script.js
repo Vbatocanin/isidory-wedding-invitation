@@ -167,6 +167,25 @@
   });
   window.addEventListener('keydown', registerInteraction, { passive: true });
 
+  // ---- Hard overscroll lock ----
+  // CSS overscroll-behavior isn't honoured everywhere (some Android Chrome
+  // builds still rubber-band / pull-to-refresh). This physically cancels any
+  // drag that would push past the top or bottom, so overscroll can't happen
+  // regardless of browser support. Non-passive so preventDefault works.
+  var touchStartY = 0;
+  scroller.addEventListener('touchstart', function (e) {
+    touchStartY = e.touches[0].clientY;
+  }, { passive: true });
+
+  scroller.addEventListener('touchmove', function (e) {
+    var dy       = e.touches[0].clientY - touchStartY; // >0 = finger down = scroll up
+    var atTop    = scroller.scrollTop <= 0;
+    var atBottom = scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1;
+    if ((atTop && dy > 0) || (atBottom && dy < 0)) {
+      e.preventDefault();
+    }
+  }, { passive: false });
+
   // ---- Music toggle ----
   function setPlayingUI(isPlaying) {
     musicToggle.classList.toggle('playing', isPlaying);
