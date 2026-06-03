@@ -14,6 +14,11 @@
 html {
   margin: 0;
   padding: 0;
+  /* Cream backdrop so any momentary boundary gap matches the gallery, not white */
+  background: var(--cream);
+  /* Kill rubber-band bounce, pull-to-refresh and scroll-chaining on mobile.
+     Without this the position:fixed visuals appear to jump at the top/bottom. */
+  overscroll-behavior: none;
 }
 
 body {
@@ -25,6 +30,9 @@ body {
   font-family: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* Steady the scroll: no overscroll bounce, vertical-only gestures */
+  overscroll-behavior: none;
+  touch-action: pan-y;
 }
 
 /* ---------- Gallery screen ---------- */
