@@ -97,40 +97,78 @@
     requestAnimationFrame(loop);
   }
 
-  // ---- The reveal: smoothly sweep progressY from 0 → SCROLL_RANGE ----
-  function animateReveal(duration) {
-    var startY = progressY;
-    var diff   = SCROLL_RANGE - startY;
-    var startT = null;
+  // ---- Smoothly sweep progressY to a target (drives the reveal both ways) ----
+  var animToken = 0;
+  function animateProgress(targetY, duration, onDone) {
+    var myToken = ++animToken;   // cancels any in-flight animation
+    var startY  = progressY;
+    var diff    = targetY - startY;
+    var startT  = null;
 
     function step(ts) {
+      if (myToken !== animToken) return;   // superseded by a newer animation
       if (!startT) startT = ts;
       var t = clamp((ts - startT) / duration, 0, 1);
       progressY = startY + diff * easeInOutCubic(t);
-      if (t < 1) requestAnimationFrame(step);
+      if (t < 1) {
+        requestAnimationFrame(step);
+      } else if (onDone) {
+        onDone();
+      }
     }
     requestAnimationFrame(step);
   }
 
   // ---- Detect the *first* scroll gesture, play the reveal once, then stop ----
   var intentEvents = ['wheel', 'touchmove', 'keydown'];
+  var historyPushed = false;
+
+  function addIntentListeners() {
+    intentEvents.forEach(function (evt) {
+      window.addEventListener(evt, onIntent, { passive: true });
+    });
+  }
+  function removeIntentListeners() {
+    intentEvents.forEach(function (evt) {
+      window.removeEventListener(evt, onIntent);
+    });
+  }
 
   function reveal(duration) {
     if (revealed) return;
     revealed = true;
     clearTimeout(idleTimer);
-    intentEvents.forEach(function (evt) {
-      window.removeEventListener(evt, onIntent);
-    });
+    removeIntentListeners();
     startMusic();
-    animateReveal(duration);
+    // Add a history entry so a phone "back" swipe scrolls us back to the top
+    // (popstate) instead of leaving the invitation.
+    if (!historyPushed) {
+      historyPushed = true;
+      try { history.pushState({ inv: true }, ''); } catch (e) {}
+    }
+    animateProgress(SCROLL_RANGE, duration);
   }
+
+  // ---- Back gesture: reverse the reveal, returning to the top (gallery) ----
+  function backToTop(duration) {
+    if (!revealed) return;
+    revealed = false;
+    galleryScreen.style.visibility = 'visible';
+    animateProgress(0, duration, function () {
+      // Ready to be revealed again from the top
+      addIntentListeners();
+      idleTimer = setTimeout(function () { reveal(3500); }, 10000);
+    });
+  }
+
+  window.addEventListener('popstate', function () {
+    historyPushed = false;     // the entry we pushed has been consumed
+    backToTop(1400);
+  });
 
   function onIntent() { reveal(2600); }
 
-  intentEvents.forEach(function (evt) {
-    window.addEventListener(evt, onIntent, { passive: true });
-  });
+  addIntentListeners();
 
   // Tapping the hint plays the reveal a touch quicker
   scrollHint.addEventListener('click', function () { reveal(1600); });
@@ -138,21 +176,49 @@
   // If the guest never scrolls, gently reveal on its own after 10 s
   idleTimer = setTimeout(function () { reveal(3500); }, 10000);
 
-  // ---- Music: starts on the same first gesture that triggers the reveal ----
-  // Browsers block autoplay until the user interacts, so we kick the song off
-  // on that first scroll/tap/key.
+  // ---- Music ----------------------------------------------------------------
+  // We want the song to start as early as possible. Browsers block autoplay
+  // until a genuine user gesture, and crucially iOS Safari only counts
+  // *discrete* gestures — touchstart / touchend / click / keydown — NOT the
+  // continuous `touchmove` of a swipe. So unlocking on touchmove (the scroll
+  // that drives the reveal) silently fails on iPhone, while the toggle button
+  // tap works. We therefore arm a dedicated set of unlock listeners that fire
+  // on the *start* of any interaction, independent of the reveal animation.
   function startMusic() {
-    if (musicStarted) return;
-    musicStarted = true;
     musicToggle.hidden = false;
     var attempt = song.play();
-    if (attempt && typeof attempt.catch === 'function') {
-      attempt.catch(function () {
-        // Playback was blocked — let the user start it from the toggle.
+    if (attempt && typeof attempt.then === 'function') {
+      attempt.then(function () {
+        musicStarted = true;
+      }).catch(function () {
+        // Blocked (no qualifying gesture yet) — a real tap will retry below.
         musicStarted = false;
         setPlayingUI(false);
       });
+    } else {
+      musicStarted = true;
     }
+  }
+
+  // Gestures iOS accepts as audio-unlocking. `touchstart` fires at the very
+  // beginning of a swipe, so the same swipe that reveals the page also starts
+  // the music.
+  var unlockEvents = ['pointerdown', 'touchstart', 'mousedown', 'keydown'];
+  function armUnlock() {
+    unlockEvents.forEach(function (evt) {
+      window.addEventListener(evt, onUnlock, { passive: true });
+    });
+  }
+  function disarmUnlock() {
+    unlockEvents.forEach(function (evt) {
+      window.removeEventListener(evt, onUnlock);
+    });
+  }
+  function onUnlock() {
+    startMusic();
+    // play() flips `paused` to false synchronously when it's accepted, so this
+    // reliably tells us the gesture unlocked playback.
+    if (!song.paused) disarmUnlock();
   }
 
   // ---- Music toggle ----
@@ -173,10 +239,30 @@
   song.addEventListener('play',  function () { setPlayingUI(true); });
   song.addEventListener('pause', function () { setPlayingUI(false); });
 
+  // iOS often restores the page from its back/forward cache when the guest
+  // navigates back to it. The <audio> element comes back in a stale, paused
+  // state, so playback "doesn't work on revisit". Detect that restore and
+  // re-arm everything so the next tap/swipe starts the song again.
+  window.addEventListener('pageshow', function (e) {
+    if (e.persisted) {
+      musicStarted = false;
+      setPlayingUI(false);
+      startMusic();          // try to resume straight away
+      armUnlock();           // …and fall back to the next gesture if blocked
+    }
+  });
+
   // ---- Boot ----
   computeScrollRange();
   applyInitialState();
   requestAnimationFrame(loop);
+
+  // Try to play the moment the page opens; most browsers will block this until
+  // a gesture, so we also arm the unlock listeners as a fallback. Either way
+  // the music starts as early as the browser allows.
+  setPlayingUI(false);
+  startMusic();
+  armUnlock();
 
   window.addEventListener('resize', function () {
     computeScrollRange();
