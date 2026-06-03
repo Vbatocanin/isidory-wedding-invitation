@@ -139,6 +139,8 @@
     revealed = true;
     clearTimeout(idleTimer);
     removeIntentListeners();
+    addBackListeners();          // now allow a swipe-down to return to the gallery
+    backLockUntil = Date.now() + 700;   // ignore the tail of the revealing gesture
     startMusic();
     // Add a history entry so a phone "back" swipe scrolls us back to the top
     // (popstate) instead of leaving the invitation.
@@ -153,11 +155,63 @@
   function backToTop(duration) {
     if (!revealed) return;
     revealed = false;
+    removeBackListeners();
     galleryScreen.style.visibility = 'visible';
     animateProgress(0, duration, function () {
       // Ready to be revealed again from the top
+      goingBack = false;
       addIntentListeners();
       idleTimer = setTimeout(function () { reveal(3500); }, 10000);
+    });
+  }
+
+  // Swiping down (or scrolling / arrow-down) on the invitation takes us back to
+  // the gallery. Route through history.back() when we pushed an entry so the
+  // browser history stays in sync; otherwise reverse directly. A short lock
+  // after the reveal keeps the tail of the revealing gesture from bouncing
+  // straight back (the back direction now matches the forward scroll direction).
+  var goingBack     = false;
+  var backLockUntil = 0;
+  function triggerBack() {
+    if (!revealed || goingBack || Date.now() < backLockUntil) return;
+    goingBack = true;
+    if (historyPushed) {
+      history.back();            // fires the popstate handler → backToTop
+    } else {
+      backToTop(1400);
+    }
+  }
+
+  // ---- Swipe-down-to-gallery listeners (active only while the invitation shows) ----
+  var backEvents  = ['wheel', 'touchstart', 'touchmove', 'keydown'];
+  var backTouchY  = null;        // null until a fresh touch begins under these listeners
+  function onBackIntent(e) {
+    if (!revealed) return;
+    switch (e.type) {
+      case 'touchstart':
+        backTouchY = e.touches[0].clientY;
+        break;
+      case 'touchmove':
+        // finger travelling downward (Y increasing) = swipe down
+        if (backTouchY !== null && e.touches[0].clientY - backTouchY > 45) triggerBack();
+        break;
+      case 'wheel':
+        if (e.deltaY > 0) triggerBack();          // scrolling down
+        break;
+      case 'keydown':
+        if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === 'End') triggerBack();
+        break;
+    }
+  }
+  function addBackListeners() {
+    backEvents.forEach(function (evt) {
+      window.addEventListener(evt, onBackIntent, { passive: true });
+    });
+  }
+  function removeBackListeners() {
+    backTouchY = null;
+    backEvents.forEach(function (evt) {
+      window.removeEventListener(evt, onBackIntent);
     });
   }
 
