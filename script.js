@@ -139,6 +139,7 @@
     revealed = true;
     clearTimeout(idleTimer);
     removeIntentListeners();
+    addBackListeners();          // now allow a swipe-up to return to the gallery
     startMusic();
     // Add a history entry so a phone "back" swipe scrolls us back to the top
     // (popstate) instead of leaving the invitation.
@@ -153,11 +154,59 @@
   function backToTop(duration) {
     if (!revealed) return;
     revealed = false;
+    removeBackListeners();
     galleryScreen.style.visibility = 'visible';
     animateProgress(0, duration, function () {
       // Ready to be revealed again from the top
+      goingBack = false;
       addIntentListeners();
       idleTimer = setTimeout(function () { reveal(3500); }, 10000);
+    });
+  }
+
+  // Swiping up (or scrolling / arrow-up) on the invitation takes us back to the
+  // gallery. Route through history.back() when we pushed an entry so the
+  // browser history stays in sync; otherwise reverse directly.
+  var goingBack = false;
+  function triggerBack() {
+    if (!revealed || goingBack) return;
+    goingBack = true;
+    if (historyPushed) {
+      history.back();            // fires the popstate handler → backToTop
+    } else {
+      backToTop(1400);
+    }
+  }
+
+  // ---- Swipe-up-to-gallery listeners (active only while the invitation shows) ----
+  var backEvents  = ['wheel', 'touchstart', 'touchmove', 'keydown'];
+  var backTouchY  = 0;
+  function onBackIntent(e) {
+    if (!revealed) return;
+    switch (e.type) {
+      case 'touchstart':
+        backTouchY = e.touches[0].clientY;
+        break;
+      case 'touchmove':
+        // finger travelling upward (start higher value → smaller) = swipe up
+        if (backTouchY - e.touches[0].clientY > 45) triggerBack();
+        break;
+      case 'wheel':
+        if (e.deltaY < 0) triggerBack();          // scrolling up
+        break;
+      case 'keydown':
+        if (e.key === 'ArrowUp' || e.key === 'PageUp' || e.key === 'Home') triggerBack();
+        break;
+    }
+  }
+  function addBackListeners() {
+    backEvents.forEach(function (evt) {
+      window.addEventListener(evt, onBackIntent, { passive: true });
+    });
+  }
+  function removeBackListeners() {
+    backEvents.forEach(function (evt) {
+      window.removeEventListener(evt, onBackIntent);
     });
   }
 
