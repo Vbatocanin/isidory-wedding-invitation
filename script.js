@@ -1,8 +1,10 @@
-// Wedding invitation — scroll-driven parallax gallery
+// Wedding invitation — one-shot reveal
+// The page never scrolls. The first scroll gesture (wheel / touch drag / key)
+// plays the whole parallax-and-zoom reveal smoothly, then we stop listening.
+// With nothing scrollable, overscroll / rubber-band / pull-to-refresh can't happen.
 (function () {
   'use strict';
 
-  var scroller      = document.getElementById('scroller');
   var galleryScreen = document.getElementById('gallery-screen');
   var invPanel      = document.getElementById('invitation-panel');
   var scrollHint    = document.getElementById('scroll-hint');
@@ -20,10 +22,11 @@
   ];
 
   var SCROLL_RANGE  = 0;
-  var lastScrollY   = -1;
+  var progressY     = 0;     // virtual scroll position (0 → SCROLL_RANGE) driving the animation
+  var lastRendered  = -1;
+  var revealed      = false; // the one-shot reveal has fired
   var musicStarted  = false;
-  var autoScrolling = false;
-  var autoTimer     = null;
+  var idleTimer     = null;
 
   function clamp(v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; }
 
@@ -32,11 +35,8 @@
   }
 
   function computeScrollRange() {
-    SCROLL_RANGE = scroller.scrollHeight - scroller.clientHeight;
-  }
-
-  function getScrollY() {
-    return scroller.scrollTop;
+    // ~1.2 screen-heights of travel — matches the old 220vh body sweep
+    SCROLL_RANGE = window.innerHeight * 1.2;
   }
 
   // ---- Initial state ----
@@ -49,13 +49,12 @@
     invPanel.style.opacity   = '0';
   }
 
-  // ---- Main render ----
+  // ---- Main render (driven by progressY, not real scroll) ----
   function render() {
-    var scrollY = getScrollY();
+    if (progressY === lastRendered) return;
+    lastRendered = progressY;
 
-    if (scrollY === lastScrollY) return;
-    lastScrollY = scrollY;
-
+    var scrollY  = progressY;
     var progress = clamp(scrollY / SCROLL_RANGE, 0, 1);
 
     // --- Photos: depth-based parallax + staggered fade ---
@@ -75,7 +74,7 @@
     }
 
     // --- Invitation panel: zooms in from the centre ---
-    // Starts animating at 15% scroll progress, completes at 100%
+    // Starts animating at 15% progress, completes at 100%
     var invP  = clamp((progress - 0.15) / 0.85, 0, 1);
     var eased = easeInOutCubic(invP);
 
@@ -85,7 +84,7 @@
     invPanel.style.opacity   = String(clamp(invP / 0.25, 0, 1));
     invPanel.setAttribute('aria-hidden', invP > 0.05 ? 'false' : 'true');
 
-    // --- Scroll hint: fades out as soon as scrolling begins ---
+    // --- Scroll hint: fades out as soon as the reveal begins ---
     scrollHint.style.opacity = String(1 - clamp(progress / 0.08, 0, 1));
 
     // Hide gallery underneath when fully covered (saves paint)
@@ -98,41 +97,50 @@
     requestAnimationFrame(loop);
   }
 
-  // ---- Auto-scroll: kicks in after 10 s of no user interaction ----
-  function smoothScrollTo(target, duration, done) {
-    var startY = getScrollY();
-    var diff   = target - startY;
+  // ---- The reveal: smoothly sweep progressY from 0 → SCROLL_RANGE ----
+  function animateReveal(duration) {
+    var startY = progressY;
+    var diff   = SCROLL_RANGE - startY;
     var startT = null;
 
     function step(ts) {
       if (!startT) startT = ts;
       var t = clamp((ts - startT) / duration, 0, 1);
-      scroller.scrollTop = startY + diff * easeInOutCubic(t);
-      if (t < 1) {
-        requestAnimationFrame(step);
-      } else if (typeof done === 'function') {
-        done();
-      }
+      progressY = startY + diff * easeInOutCubic(t);
+      if (t < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
-  // Idle timer: 10 s after the last genuine interaction (and only while still
-  // near the top), gently auto-scroll to the invitation.
-  function scheduleAutoScroll() {
-    clearTimeout(autoTimer);
-    autoTimer = setTimeout(function () {
-      var atTop = getScrollY() < SCROLL_RANGE * 0.05;
-      if (!autoScrolling && atTop) {
-        autoScrolling = true;
-        smoothScrollTo(SCROLL_RANGE, 3500, function () { autoScrolling = false; });
-      }
-    }, 10000);
+  // ---- Detect the *first* scroll gesture, play the reveal once, then stop ----
+  var intentEvents = ['wheel', 'touchmove', 'keydown'];
+
+  function reveal(duration) {
+    if (revealed) return;
+    revealed = true;
+    clearTimeout(idleTimer);
+    intentEvents.forEach(function (evt) {
+      window.removeEventListener(evt, onIntent);
+    });
+    startMusic();
+    animateReveal(duration);
   }
 
-  // ---- Music: start on the very first user gesture ----
+  function onIntent() { reveal(2600); }
+
+  intentEvents.forEach(function (evt) {
+    window.addEventListener(evt, onIntent, { passive: true });
+  });
+
+  // Tapping the hint plays the reveal a touch quicker
+  scrollHint.addEventListener('click', function () { reveal(1600); });
+
+  // If the guest never scrolls, gently reveal on its own after 10 s
+  idleTimer = setTimeout(function () { reveal(3500); }, 10000);
+
+  // ---- Music: starts on the same first gesture that triggers the reveal ----
   // Browsers block autoplay until the user interacts, so we kick the song off
-  // on the first scroll/tap/key — i.e. as soon as someone starts scrolling.
+  // on that first scroll/tap/key.
   function startMusic() {
     if (musicStarted) return;
     musicStarted = true;
@@ -140,32 +148,12 @@
     var attempt = song.play();
     if (attempt && typeof attempt.catch === 'function') {
       attempt.catch(function () {
-        // Playback was blocked — let the user try again on the next gesture.
+        // Playback was blocked — let the user start it from the toggle.
         musicStarted = false;
         setPlayingUI(false);
       });
     }
   }
-
-  function registerInteraction() {
-    startMusic();
-    // Ignore scroll events produced by our own programmatic auto-scroll
-    if (autoScrolling) return;
-    scheduleAutoScroll();
-  }
-
-  // Clicking the hint scrolls straight to the invitation
-  scrollHint.addEventListener('click', function () {
-    clearTimeout(autoTimer);
-    autoScrolling = true;
-    smoothScrollTo(SCROLL_RANGE, 1800, function () { autoScrolling = false; });
-  });
-
-  // Scroll/pointer gestures happen on the scroller; keydown stays on window.
-  ['touchstart', 'mousedown', 'wheel'].forEach(function (evt) {
-    scroller.addEventListener(evt, registerInteraction, { passive: true });
-  });
-  window.addEventListener('keydown', registerInteraction, { passive: true });
 
   // ---- Music toggle ----
   function setPlayingUI(isPlaying) {
@@ -189,10 +177,13 @@
   computeScrollRange();
   applyInitialState();
   requestAnimationFrame(loop);
-  scheduleAutoScroll();
 
   window.addEventListener('resize', function () {
     computeScrollRange();
-    applyInitialState();
+    if (revealed) {
+      progressY = SCROLL_RANGE;   // keep the invitation fully shown after a resize
+    } else {
+      applyInitialState();
+    }
   }, { passive: true });
 }());

@@ -18,10 +18,9 @@ html {
   background: var(--cream);
 }
 
-/* The document itself never scrolls — scrolling lives inside #scroller. This is
-   what makes overscroll rock-solid on mobile: Android's pull-to-refresh and the
-   rubber-band bounce are tied to the *root* scroller, so moving the scroll into a
-   nested element disables them outright. */
+/* Nothing scrolls — anywhere. The whole experience is a fixed stage; the first
+   scroll gesture plays the reveal animation in JS. With no scrollable element
+   there is simply nothing to overscroll, rubber-band, or pull-to-refresh. */
 html,
 body {
   height: 100%;
@@ -37,23 +36,14 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ---------- Scroll container ---------- */
+/* ---------- Fixed stage ---------- */
 #scroller {
   position: fixed;
   inset: 0;
-  overflow-y: scroll;
-  overflow-x: hidden;
-  /* Belt-and-suspenders: kill any bounce/glow within the container too */
+  overflow: hidden;
+  /* No panning/zooming gestures — keeps the stage rock-steady on touch */
+  touch-action: none;
   overscroll-behavior: none;
-  touch-action: pan-y;
-}
-
-/* Invisible spacer — its height (220vh = ~1.2 extra screens) is the scroll room.
-   The gallery and invitation are position:fixed, so they sit on top of it. */
-#scroll-spacer {
-  width: 1px;
-  height: 220vh;
-  pointer-events: none;
 }
 
 /* ---------- Gallery screen ---------- */
