@@ -14,16 +14,16 @@
   />
 
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
-  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="styles.css?v=5" />
 </head>
 <body>
 
-  <!-- Scroll happens inside this container (not the document) so Android's
-       pull-to-refresh / rubber-band overscroll never triggers. The visuals are
-       position:fixed; #scroll-spacer provides the scroll distance. -->
+  <!-- Fixed, non-scrollable stage. The page never scrolls; the first scroll
+       gesture plays the whole reveal animation (see script.js), so there is
+       nothing to overscroll. -->
   <div id="scroller">
 
-  <!-- Photo gallery — first screen; all visuals are position:fixed, the spacer provides scroll room -->
+  <!-- Photo gallery — first screen; all visuals are position:fixed -->
   <div id="gallery-screen">
     <div class="photo-item" id="photo-0">
       <img src="assets/images/IMG_4071.png" alt="" />
@@ -71,12 +71,9 @@
     </button>
   </div>
 
-  <!-- Invisible block that gives the scroller its scroll length -->
-  <div id="scroll-spacer" aria-hidden="true"></div>
-
   </div><!-- /#scroller -->
 
   <audio id="song" src="assets/felicita.mp3" loop preload="auto"></audio>
-  <script src="script.js"></script>
+  <script src="script.js?v=5"></script>
 </body>
 </html>
