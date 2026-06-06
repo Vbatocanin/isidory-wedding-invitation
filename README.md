@@ -71,3 +71,32 @@ it on (one time):
 
 Because the page uses relative asset paths, it works correctly under the
 `/isidory-wedding-invitation/` sub-path with no extra configuration.
+
+## Custom domain — `isidora-i-nebojsa.com`
+
+The site is served directly at **`https://isidora-i-nebojsa.com`** (the
+github.io URL never shows — no redirect). This is wired up by the `CNAME` file
+in the repo root, which tells GitHub Pages which domain to answer for.
+
+**DNS (set at the registrar, e.g. GoDaddy):**
+
+| Type | Host | Value |
+| --- | --- | --- |
+| A | `@` | `185.199.108.153` |
+| A | `@` | `185.199.109.153` |
+| A | `@` | `185.199.110.153` |
+| A | `@` | `185.199.111.153` |
+| CNAME | `www` | `vbatocanin.github.io` |
+
+The four `A` records are GitHub Pages' servers (same for every Pages site); the
+`www` CNAME lets `www.isidora-i-nebojsa.com` resolve too.
+
+**One-time setup in the repo:**
+
+1. After this is on `main`, go to **Settings → Pages → Custom domain**, enter
+   `isidora-i-nebojsa.com`, and save. (The `CNAME` file usually fills this in
+   automatically.)
+2. Wait for the **DNS check** to pass, then tick **Enforce HTTPS** — GitHub
+   provisions a free TLS certificate, which can take up to an hour.
+
+DNS changes can take anywhere from a few minutes to a few hours to propagate.
