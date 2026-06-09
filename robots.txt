@@ -1,0 +1,3 @@
+# Private wedding invitation — please do not index or crawl.
+User-agent: *
+Disallow: /
