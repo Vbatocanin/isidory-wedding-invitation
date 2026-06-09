@@ -132,7 +132,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 20;
-  background: url("assets/floral_background.png") center center / cover no-repeat;
+  background: url("assets/floral_background.webp") center center / cover no-repeat;
   display: flex;
   flex-direction: column;
   align-items: center;
